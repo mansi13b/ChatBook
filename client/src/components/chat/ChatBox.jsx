@@ -1,4 +1,4 @@
-import { useContext, useState} from "react";
+import { useContext, useState,useRef, useEffect} from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { ChatContext } from "../../context/ChatContext";
 import { useFetchRecipientUser } from "../../hooks/useFetchRecipient";
@@ -12,9 +12,18 @@ const ChatBox = () => {
     const {currentChat, messages, isMessagesLoading, sendTextMessage} = useContext(ChatContext)
     const {recipientUser } = useFetchRecipientUser(currentChat, user)
     const [textMessage ,setTextMessage]= useState("")
-
+    const scroll = useRef();
     console.log("text",textMessage)
    // console.log("recipient user: ", recipientUser)
+
+
+   //everytime you get a message invoke getMessagee
+   useEffect(()=>{
+    scroll.current?.scrollIntoView({behavior: "smooth"})
+   },[messages])
+
+
+   
     if(!recipientUser) 
    { return (
         <p style={{textAlign: "center", width:"100%"} }>
@@ -38,7 +47,10 @@ const ChatBox = () => {
             {messages && messages.map((message, index)=> (
                 //"message align-self-start flex-grow-0": message to appear on the left side of the screen, indicating that it was sent by another user
                 //message self align-self-end flex-grow-0: message to appear on the right side of the screen, indicating that it was sent by us
-            <Stack key={index} className={`${message?.senderId === user?._id ? "message self align-self-end flex-grow-0" : "message align-self-start flex-grow-0"}`}>
+            <Stack key={index} className={`${message?.senderId === user?._id 
+            ? "message self align-self-end flex-grow-0" 
+            : "message align-self-start flex-grow-0"}`}>
+                ref = {scroll}
                 <span>
                     {message.text}
                 </span>
